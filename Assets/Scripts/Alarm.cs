@@ -1,53 +1,60 @@
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider))]
 public class Alarm : MonoBehaviour
 {
     [SerializeField] private AudioSource _sound;
+    [SerializeField] private IntruderDetector _intruderDetector;
 
+    private float _minVolume = 0f;
+    private float _maxVolume = 1f;
     private float _fadeSpeed = 0.2f;
 
     private void Awake()
     {
         _sound.volume = 0f;
+
+        _intruderDetector.OnDetected += StartAlarm;
+        _intruderDetector.OnLost += StopAlarm;
     }
 
-    private void OnTriggerEnter(Collider intruder)
+    private void OnDestroy()
+    {
+        _intruderDetector.OnDetected -= StartAlarm;
+        _intruderDetector.OnLost -= StopAlarm;
+    }
+
+    private void StartAlarm()
     {
         StopAllCoroutines();
 
-        StartCoroutine(FadeIn());
+        if (_sound.isPlaying == false)
+        {
+            _sound.Play();
+        }
+
+        StartCoroutine(Fade(_maxVolume));
     }
 
-    private void OnTriggerExit(Collider intruder)
+    private void StopAlarm()
     {
         StopAllCoroutines();
 
-        StartCoroutine(FadeOut());
+        StartCoroutine(Fade(_minVolume));
     }
 
-    private IEnumerator FadeIn()
+    private IEnumerator Fade(float targetVolume)
     {
-        _sound.Play();
-
-        while (_sound.volume < 1f)
+        while (Mathf.Approximately(_sound.volume, targetVolume) == false)
         {
-            _sound.volume = Mathf.MoveTowards(_sound.volume, 1f, _fadeSpeed * Time.deltaTime);
-
-            yield return null;
-        }
-    }
-
-    private IEnumerator FadeOut()
-    {
-        while (_sound.volume > 0f)
-        {
-            _sound.volume = Mathf.MoveTowards(_sound.volume, 0, _fadeSpeed * Time.deltaTime);
-
+            _sound.volume = Mathf.MoveTowards(_sound.volume, targetVolume, _fadeSpeed * Time.deltaTime);
             yield return null;
         }
 
-        _sound.Stop();
+        if (Mathf.Approximately(targetVolume, _minVolume))
+        {
+            _sound.Stop();
+        }
     }
+
 }
