@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class PlayerMovement
 {
-    private CharacterController _characterController;
-    private float _speed = 10f;
-
     private readonly string _axisX = "Horizontal";
     private readonly string _axisY = "Vertical";
+
+    private CharacterController _characterController;
+    private float _speed = 10f;
 
     public PlayerMovement(CharacterController characterController)
     {

@@ -11,17 +11,23 @@ public class IntruderDetector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == _intruder.gameObject)
+        if (other.TryGetComponent<Player>(out Player player))
         {
-            OnDetected?.Invoke();
+            if (player == _intruder)
+            {
+                OnDetected?.Invoke();
+            }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject == _intruder.gameObject)
+        if (other.TryGetComponent<Player>(out Player player))
         {
-            OnLost?.Invoke();
+            if (player == _intruder)
+            {
+                OnLost?.Invoke();
+            }
         }
     }
 }
