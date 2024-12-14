@@ -19,17 +19,17 @@ public class Alarm : MonoBehaviour
 
     private void OnEnable()
     {
-        _intruderDetector.OnDetected += StartAlarm;
-        _intruderDetector.OnLost += StopAlarm;
+        _intruderDetector.OnDetected += Play;
+        _intruderDetector.OnLost += Stop;
     }
 
     private void OnDisable()
     {
-        _intruderDetector.OnDetected -= StartAlarm;
-        _intruderDetector.OnLost -= StopAlarm;
+        _intruderDetector.OnDetected -= Play;
+        _intruderDetector.OnLost -= Stop;
     }
 
-    private void StartAlarm()
+    private void Play()
     {
         if (_currentFade != null)
         {
@@ -41,15 +41,16 @@ public class Alarm : MonoBehaviour
             _sound.Play();
         }
 
-        StartCoroutine(Fade(_maxVolume));
         _currentFade = StartCoroutine(Fade(_maxVolume));
     }
 
-    private void StopAlarm()
+    private void Stop()
     {
-        StopCoroutine(_currentFade);
+        if (_currentFade != null)
+        {
+            StopCoroutine(_currentFade);
+        }
 
-        StartCoroutine(Fade(_minVolume));
         _currentFade = StartCoroutine(Fade(_minVolume));
     }
 
